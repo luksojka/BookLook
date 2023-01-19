@@ -1,5 +1,8 @@
 package com.booklook.booklook;
 
+import com.booklook.booklook.catalog.application.CatalogController;
+import com.booklook.booklook.catalog.domain.Book;
+import com.booklook.booklook.catalog.domain.CatalogService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -7,22 +10,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.util.List;
 
 @SpringBootApplication
-public class BooklookOnlineStoreApplication implements CommandLineRunner {
+public class BooklookOnlineStoreApplication {
 
 
 
     public static void main(String[] args) {
         SpringApplication.run(BooklookOnlineStoreApplication.class, args);
     }
-    private final CatalogService catalogService;
 
-    public BooklookOnlineStoreApplication(CatalogService catalogService) {
-        this.catalogService = catalogService;
-    }
-
-    @Override
-    public void run(String... args) {
-        List<Book> books = catalogService.findByTitle("Pan Tadeusz");
-        books.forEach(System.out::println);
-    }
 }

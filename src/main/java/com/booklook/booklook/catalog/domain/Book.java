@@ -1,4 +1,4 @@
-package com.booklook.booklook;
+package com.booklook.booklook.catalog.domain;
 
 public class Book {
     Long id;
