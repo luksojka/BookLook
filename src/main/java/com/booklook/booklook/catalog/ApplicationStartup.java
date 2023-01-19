@@ -1,6 +1,7 @@
 package com.booklook.booklook.catalog;
 
 import com.booklook.booklook.catalog.application.port.CatalogUseCase;
+import com.booklook.booklook.catalog.application.port.CatalogUseCase.UpdateBookCommand;
 import com.booklook.booklook.catalog.domain.Book;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -32,6 +33,8 @@ public class ApplicationStartup implements CommandLineRunner {
     public void run(String... args) {
         initData();
         findByTitle();
+        findAndUpdate();
+        findByTitle();
         findByAuthor();
     }
 
@@ -50,5 +53,18 @@ public class ApplicationStartup implements CommandLineRunner {
     private void findByAuthor() {
         List<Book> books = catalog.findByAuthor(author);
         books.forEach(System.out::println);
+    }
+
+    private void findAndUpdate() {
+        catalog.findOneByTitleAndAuthor("Karaluchy", "Jo Nesbo")
+                .ifPresent(book -> {
+                    UpdateBookCommand command = new UpdateBookCommand(
+                            book.getId(),
+                            "Karaluchy test",
+                            book.getAuthor(),
+                            book.getYear()
+                    );
+                    catalog.updateBook(command);
+                });
     }
 }

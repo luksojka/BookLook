@@ -7,6 +7,8 @@ import com.booklook.booklook.catalog.domain.CatalogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,12 +37,16 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public List<Book> findAll() {
-        return null;
+        return repository.findAll();
     }
 
     @Override
     public Optional<Book> findOneByTitleAndAuthor(String title, String author) {
-        return Optional.empty();
+        return repository.findAll()
+                .stream()
+                .filter(book -> book.getTitle().startsWith(title))
+                .filter(book -> book.getAuthor().startsWith(author))
+                .findFirst();
     }
 
     @Override
@@ -50,12 +56,23 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
-    public void removeBook(Long id) {
-
+    public UpdateBookResponse updateBook(UpdateBookCommand command) {
+        return repository
+                .findById(command.getId())
+                .map(book -> {
+                    book.setTitle(command.getTitle());
+                    book.setYear(command.getYear());
+                    book.setAuthor(command.getAuthor());
+                    repository.save(book);
+                    return UpdateBookResponse.SUCCESS;
+                })
+                .orElseGet(() -> new UpdateBookResponse(false, Collections.singletonList("Book not found with id: " + command.getId())));
     }
 
     @Override
-    public void updateBook() {
+    public void removeById(Long id) {
 
     }
+
+
 }
