@@ -1,22 +1,54 @@
 package com.booklook.booklook.catalog;
 
-import com.booklook.booklook.catalog.application.CatalogController;
+import com.booklook.booklook.catalog.application.port.CatalogUseCase;
 import com.booklook.booklook.catalog.domain.Book;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class ApplicationStartup implements CommandLineRunner {
 
-    private final CatalogController catalogController;
+    private final CatalogUseCase catalog;
+    private final String title;
+    private final String author;
+    private final Long limit;
+
+    public ApplicationStartup(
+            CatalogUseCase catalog,
+            @Value("${bookaro.catalog.query}") String title,
+            @Value("${bookaro.catalog.author}") String author,
+            @Value("${bookaro.catalog.limit}") Long limit
+    ) {
+        this.catalog = catalog;
+        this.title = title;
+        this.author = author;
+        this.limit = limit;
+    }
 
     @Override
     public void run(String... args) {
-        List<Book> books = catalogController.findByTitle("Pan");
+        initData();
+        findByTitle();
+        findByAuthor();
+    }
+
+    private void initData() {
+        catalog.addBook(new CatalogUseCase.CreateBookCommand("Karaluchy", "Jo Nesbo", 1998));
+        catalog.addBook(new CatalogUseCase.CreateBookCommand("Władca Pierścieni: Powrót Króla", "JRR Tolkien", 1955));
+        catalog.addBook(new CatalogUseCase.CreateBookCommand("Pierwszy Śnieg", "Jo Nesbo", 2007));
+        catalog.addBook(new CatalogUseCase.CreateBookCommand("I nie było już nikogo", "Agatha Christie", 1939));
+    }
+
+    private void findByTitle() {
+        List<Book> books = catalog.findByTitle(title);
+        books.forEach(System.out::println);
+    }
+
+    private void findByAuthor() {
+        List<Book> books = catalog.findByAuthor(author);
         books.forEach(System.out::println);
     }
 }
