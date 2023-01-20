@@ -4,12 +4,15 @@ import com.booklook.booklook.catalog.domain.Book;
 import lombok.Builder;
 import lombok.Value;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 public interface CatalogUseCase {
     List<Book> findByTitle(String title);
+
+    Optional<Book> findOneByTitle(String title);
 
     List<Book> findByAuthor(String author);
 
@@ -28,6 +31,11 @@ public interface CatalogUseCase {
         String title;
         String author;
         Integer year;
+        BigDecimal price;
+
+        public Book toBook() {
+            return new Book(title, author, year, price);
+        }
     }
 
     @Value
@@ -37,6 +45,7 @@ public interface CatalogUseCase {
         String title;
         String author;
         Integer year;
+        BigDecimal price;
 
         public Book updateFields(Book book) {
             if (title != null) {
@@ -47,6 +56,9 @@ public interface CatalogUseCase {
             }
             if (year != null) {
                 book.setYear(year);
+            }
+            if (price != null) {
+                book.setPrice(price);
             }
             return book;
         }

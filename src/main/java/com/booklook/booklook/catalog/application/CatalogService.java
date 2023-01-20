@@ -7,7 +7,6 @@ import com.booklook.booklook.catalog.domain.CatalogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +24,14 @@ class CatalogService implements CatalogUseCase {
                 .stream()
                 .filter(book -> book.getTitle().startsWith(title))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Book> findOneByTitle(String title) {
+        return repository.findAll()
+                .stream()
+                .filter(book -> book.getTitle().startsWith(title))
+                .findFirst();
     }
 
     @Override
@@ -51,7 +58,7 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public void addBook(CreateBookCommand command) {
-        Book book = new Book(command.getTitle(), command.getAuthor(), command.getYear());
+        Book book = command.toBook();
         repository.save(book);
     }
 
