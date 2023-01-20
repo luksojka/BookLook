@@ -2,7 +2,6 @@ package com.booklook.booklook.catalog.infrastructure;
 
 import com.booklook.booklook.catalog.domain.Book;
 import com.booklook.booklook.catalog.domain.CatalogRepository;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -37,6 +36,11 @@ class MemoryCatalogRepository implements CatalogRepository {
     @Override
     public Optional<Book> findById(Long id) {
         return Optional.ofNullable(storage.get(id));
+    }
+
+    @Override
+    public void removeById(Long id) {
+        storage.remove(id);
     }
 
     private long nextId() {
