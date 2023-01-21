@@ -19,16 +19,21 @@ class CatalogService implements CatalogUseCase {
     private final CatalogRepository repository;
 
     @Override
-    public List<Book> findByTitle(String title) {
-        return repository.findAll()
-                .stream()
-                .filter(book -> book.getTitle().startsWith(title))
-                .collect(Collectors.toList());
+    public List<Book> findAll() {
+        return repository.findAll();
     }
 
     @Override
     public Optional<Book> findById(Long id) {
         return repository.findById(id);
+    }
+
+    @Override
+    public List<Book> findByTitle(String title) {
+        return repository.findAll()
+                .stream()
+                .filter(book -> book.getTitle().toLowerCase().startsWith(title.toLowerCase()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -43,13 +48,25 @@ class CatalogService implements CatalogUseCase {
     public List<Book> findByAuthor(String author) {
         return repository.findAll()
                 .stream()
-                .filter(book -> book.getAuthor().startsWith(author))
+                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Book> findAll() {
-        return repository.findAll();
+    public Optional<Book> findOneByAuthor(String author) {
+        return repository.findAll()
+                .stream()
+                .filter(book -> book.getAuthor().startsWith(author))
+                .findFirst();
+    }
+
+    @Override
+    public List<Book> findByTitleAndAuthor(String title, String author) {
+        return repository.findAll()
+                .stream()
+                .filter(book -> book.getTitle().toLowerCase().contains(title.toLowerCase()))
+                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
+                .collect(Collectors.toList());
     }
 
     @Override
