@@ -5,6 +5,6 @@ import lombok.Value;
 
 @Value
 public class OrderItem {
-    Book book;
+    Long bookId;
     int quantity;
 }

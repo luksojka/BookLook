@@ -3,9 +3,9 @@ package com.booklook.booklook;
 import com.booklook.booklook.catalog.application.port.CatalogUseCase;
 import com.booklook.booklook.catalog.application.port.CatalogUseCase.UpdateBookCommand;
 import com.booklook.booklook.catalog.domain.Book;
-import com.booklook.booklook.order.application.port.PlaceOrderUseCase;
-import com.booklook.booklook.order.application.port.PlaceOrderUseCase.PlaceOrderCommand;
-import com.booklook.booklook.order.application.port.PlaceOrderUseCase.PlaceOrderResponse;
+import com.booklook.booklook.order.application.port.ManipulateOrderUseCase;
+import com.booklook.booklook.order.application.port.ManipulateOrderUseCase.PlaceOrderCommand;
+import com.booklook.booklook.order.application.port.ManipulateOrderUseCase.PlaceOrderResponse;
 import com.booklook.booklook.order.application.port.QueryOrderUseCase;
 import com.booklook.booklook.order.domain.OrderItem;
 import com.booklook.booklook.order.domain.Recipient;
@@ -20,7 +20,7 @@ import java.util.List;
 public class ApplicationStartup implements CommandLineRunner {
 
     private final CatalogUseCase catalog;
-    private final PlaceOrderUseCase placeOrder;
+    private final ManipulateOrderUseCase placeOrder;
     private final QueryOrderUseCase queryOrder;
     private final String title;
     private final String author;
@@ -28,7 +28,7 @@ public class ApplicationStartup implements CommandLineRunner {
 
     public ApplicationStartup(
             CatalogUseCase catalog,
-            PlaceOrderUseCase placeOrder,
+            ManipulateOrderUseCase placeOrder,
             QueryOrderUseCase queryOrder,
             @Value("${bookaro.catalog.query}") String title,
             @Value("${bookaro.catalog.author}") String author,
@@ -66,17 +66,22 @@ public class ApplicationStartup implements CommandLineRunner {
         PlaceOrderCommand command = PlaceOrderCommand
                 .builder()
                 .recipient(recipient)
-                .item(new OrderItem(karaluchy, 16))
-                .item(new OrderItem(wladca,7))
+                .item(new OrderItem(karaluchy.getId(), 16))
+                .item(new OrderItem(wladca.getId(),7))
                 .build();
 
         PlaceOrderResponse response = placeOrder.placeOrder(command);
-        System.out.println("Created ORDER with id: " + response.getOrderId());
+
+        String result = response.handle(
+                orderId -> "Created ORDER with id: " + orderId,
+                error -> "Failed to create order: " + error
+        );
+
+        System.out.println(result);
 
         queryOrder.findAll()
-                .forEach(order -> {
-                    System.out.println("GOT ORDER WITH TOTAL PRICE" + order.totalPrice() + " DETAILS: " + order);
-                });
+                .forEach(order -> System.out.println("GOT ORDER WITH TOTAL PRICE" + order.totalPrice() + " DETAILS: " + order));
+
     }
 
     private void searchCatalog() {

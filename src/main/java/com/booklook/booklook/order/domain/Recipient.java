@@ -1,15 +1,16 @@
 package com.booklook.booklook.order.domain;
 
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
-@Value
+@Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Recipient {
-    String name;
-    String phone;
-    String city;
-    String street;
-    String zipCode;
-    String email;
+    private String name;
+    private String phone;
+    private String city;
+    private String street;
+    private String zipCode;
+    private String email;
 }
