@@ -2,6 +2,8 @@ package com.booklook.booklook.catalog.web;
 
 import com.booklook.booklook.catalog.application.port.CatalogUseCase;
 import com.booklook.booklook.catalog.application.port.CatalogUseCase.CreateBookCommand;
+import com.booklook.booklook.catalog.application.port.CatalogUseCase.UpdateBookCommand;
+import com.booklook.booklook.catalog.application.port.CatalogUseCase.UpdateBookResponse;
 import com.booklook.booklook.catalog.domain.Book;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
@@ -12,6 +14,7 @@ import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -47,9 +50,19 @@ class CatalogController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Book addBook(@Valid @RequestBody RestCreateBookCommand command) {
-        Book book = catalog.addBook(command.toCommand());
+    public Book addBook(@Valid @RequestBody RestBookCommand command) {
+        Book book = catalog.addBook(command.toCreateCommand());
         return book;
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void updateBook(@PathVariable Long id, @RequestBody RestBookCommand command) {
+        UpdateBookResponse response = catalog.updateBook(command.toUpdateCommand(id));
+        if (!response.isSuccess()) {
+            String message = String.join(",  ", response.getErrors());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -59,7 +72,7 @@ class CatalogController {
     }
 
     @Data
-    private static class RestCreateBookCommand {
+    private static class RestBookCommand {
         @NotBlank(message = "Please provide a title")
         private String title;
 
@@ -73,8 +86,12 @@ class CatalogController {
         @DecimalMin("0.00")
         private BigDecimal price;
 
-        CreateBookCommand toCommand() {
+        CreateBookCommand toCreateCommand() {
             return new CreateBookCommand(title, author, year, price);
+        }
+
+        UpdateBookCommand toUpdateCommand(Long id) {
+            return new UpdateBookCommand(id, title, author, year, price);
         }
     }
 }

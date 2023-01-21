@@ -1,6 +1,7 @@
 package com.booklook.booklook.catalog.application.port;
 
 import com.booklook.booklook.catalog.domain.Book;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 
@@ -46,6 +47,7 @@ public interface CatalogUseCase {
 
     @Value
     @Builder
+    @AllArgsConstructor
     class UpdateBookCommand {
         Long id;
         String title;
