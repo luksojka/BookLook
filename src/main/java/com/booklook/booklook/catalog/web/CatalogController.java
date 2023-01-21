@@ -3,6 +3,7 @@ package com.booklook.booklook.catalog.web;
 import com.booklook.booklook.catalog.application.port.CatalogUseCase;
 import com.booklook.booklook.catalog.application.port.CatalogUseCase.CreateBookCommand;
 import com.booklook.booklook.catalog.application.port.CatalogUseCase.UpdateBookCommand;
+import com.booklook.booklook.catalog.application.port.CatalogUseCase.UpdateBookCoverCommand;
 import com.booklook.booklook.catalog.application.port.CatalogUseCase.UpdateBookResponse;
 import com.booklook.booklook.catalog.domain.Book;
 import jakarta.validation.Valid;
@@ -14,8 +15,10 @@ import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -63,6 +66,24 @@ class CatalogController {
             String message = String.join(",  ", response.getErrors());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
+    }
+
+    @PutMapping("/{id}/cover")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void addBookCover(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
+        System.out.println("Got file: " + file.getOriginalFilename());
+        catalog.updateBookCover(new UpdateBookCoverCommand(
+                id,
+                file.getBytes(),
+                file.getContentType(),
+                file.getOriginalFilename()
+        ));
+    }
+
+    @DeleteMapping("/{id}/cover")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeBookCover(@PathVariable Long id) {
+        catalog.removeBookCover(id);
     }
 
     @DeleteMapping("/{id}")

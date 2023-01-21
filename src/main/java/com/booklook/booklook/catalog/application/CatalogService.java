@@ -4,6 +4,9 @@ package com.booklook.booklook.catalog.application;
 import com.booklook.booklook.catalog.application.port.CatalogUseCase;
 import com.booklook.booklook.catalog.domain.Book;
 import com.booklook.booklook.catalog.domain.CatalogRepository;
+import com.booklook.booklook.uploads.application.port.UploadUseCase;
+import com.booklook.booklook.uploads.application.port.UploadUseCase.SaveUploadCommand;
+import com.booklook.booklook.uploads.domain.Upload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 class CatalogService implements CatalogUseCase {
 
     private final CatalogRepository repository;
+    private final UploadUseCase upload;
 
     @Override
     public List<Book> findAll() {
@@ -98,8 +102,28 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public void removeById(Long id) {
-repository.removeById(id);
+        repository.removeById(id);
     }
 
+    @Override
+    public void updateBookCover(UpdateBookCoverCommand command) {
+        repository.findById(command.getId())
+                .ifPresent(book -> {
+                    Upload savedUpload = upload.save(new SaveUploadCommand(command.getFilename(), command.getFile(), command.getContentType()));
+                    book.setCoverId(savedUpload.getId());
+                    repository.save(book);
+                });
+    }
 
+    @Override
+    public void removeBookCover(Long id) {
+        repository.findById(id)
+                .ifPresent(book -> {
+                    if (book.getCoverId() != null) {
+                        upload.removeById(book.getCoverId());
+                        book.setCoverId(null);
+                        repository.save(book);
+                    }
+                });
+    }
 }
