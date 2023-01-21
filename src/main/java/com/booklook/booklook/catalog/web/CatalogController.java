@@ -3,6 +3,10 @@ package com.booklook.booklook.catalog.web;
 import com.booklook.booklook.catalog.application.port.CatalogUseCase;
 import com.booklook.booklook.catalog.application.port.CatalogUseCase.CreateBookCommand;
 import com.booklook.booklook.catalog.domain.Book;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
@@ -10,8 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequestMapping("/catalog")
 @RestController
@@ -44,7 +47,7 @@ class CatalogController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Book addBook(@RequestBody RestCreateBookCommand command) {
+    public Book addBook(@Valid @RequestBody RestCreateBookCommand command) {
         Book book = catalog.addBook(command.toCommand());
         return book;
     }
@@ -57,9 +60,17 @@ class CatalogController {
 
     @Data
     private static class RestCreateBookCommand {
+        @NotBlank(message = "Please provide a title")
         private String title;
+
+        @NotBlank(message = "Please provide a author")
         private String author;
+
+        @NotNull
         private Integer year;
+
+        @NotNull
+        @DecimalMin("0.00")
         private BigDecimal price;
 
         CreateBookCommand toCommand() {
