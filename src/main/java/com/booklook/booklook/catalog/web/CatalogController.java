@@ -9,6 +9,7 @@ import com.booklook.booklook.catalog.domain.Book;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -98,8 +99,8 @@ class CatalogController {
         @NotBlank(message = "Please provide a title")
         private String title;
 
-        @NotBlank(message = "Please provide a author")
-        private String author;
+        @NotEmpty
+        private Set<Long> authors;
 
         @NotNull
         private Integer year;
@@ -109,11 +110,11 @@ class CatalogController {
         private BigDecimal price;
 
         CreateBookCommand toCreateCommand() {
-            return new CreateBookCommand(title, author, year, price);
+            return new CreateBookCommand(title, authors, year, price);
         }
 
         UpdateBookCommand toUpdateCommand(Long id) {
-            return new UpdateBookCommand(id, title, author, year, price);
+            return new UpdateBookCommand(id, title, authors, year,price );
         }
     }
 }

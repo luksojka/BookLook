@@ -1,7 +1,10 @@
 package com.booklook.booklook;
 
 import com.booklook.booklook.catalog.application.port.CatalogUseCase;
+import com.booklook.booklook.catalog.application.port.CatalogUseCase.CreateBookCommand;
 import com.booklook.booklook.catalog.application.port.CatalogUseCase.UpdateBookCommand;
+import com.booklook.booklook.catalog.db.AuthorJpaRepository;
+import com.booklook.booklook.catalog.domain.Author;
 import com.booklook.booklook.catalog.domain.Book;
 import com.booklook.booklook.order.application.port.ManipulateOrderUseCase;
 import com.booklook.booklook.order.application.port.ManipulateOrderUseCase.PlaceOrderCommand;
@@ -9,49 +12,33 @@ import com.booklook.booklook.order.application.port.ManipulateOrderUseCase.Place
 import com.booklook.booklook.order.application.port.QueryOrderUseCase;
 import com.booklook.booklook.order.domain.OrderItem;
 import com.booklook.booklook.order.domain.Recipient;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @Component
+@AllArgsConstructor
 public class ApplicationStartup implements CommandLineRunner {
 
     private final CatalogUseCase catalog;
     private final ManipulateOrderUseCase placeOrder;
     private final QueryOrderUseCase queryOrder;
-    private final String title;
-    private final String author;
-    private final Long limit;
-
-    public ApplicationStartup(
-            CatalogUseCase catalog,
-            ManipulateOrderUseCase placeOrder,
-            QueryOrderUseCase queryOrder,
-            @Value("${bookaro.catalog.query}") String title,
-            @Value("${bookaro.catalog.author}") String author,
-            @Value("${bookaro.catalog.limit}") Long limit
-    ) {
-        this.catalog = catalog;
-        this.placeOrder = placeOrder;
-        this.queryOrder = queryOrder;
-        this.title = title;
-        this.author = author;
-        this.limit = limit;
-    }
+    private final AuthorJpaRepository authorRepository;
 
     @Override
     public void run(String... args) {
         initData();
-        searchCatalog();
         placeOrder();
     }
 
     private void placeOrder() {
-        Book karaluchy = catalog.findOneByTitle("Karaluchy").orElseThrow(() -> new IllegalStateException("Cannot find a book"));
-        Book wladca = catalog.findOneByTitle("Władca Pierścieni: Powrót Króla").orElseThrow(() -> new IllegalStateException("Cannot find a book"));
+        Book effectiveJava = catalog.findOneByTitle("Effective Java").orElseThrow(() -> new IllegalStateException("Cannot find a book"));
+        Book puzzlers = catalog.findOneByTitle("Java Puzzlers").orElseThrow(() -> new IllegalStateException("Cannot find a book"));
 
         Recipient recipient = Recipient
                 .builder()
@@ -66,8 +53,8 @@ public class ApplicationStartup implements CommandLineRunner {
         PlaceOrderCommand command = PlaceOrderCommand
                 .builder()
                 .recipient(recipient)
-                .item(new OrderItem(karaluchy.getId(), 16))
-                .item(new OrderItem(wladca.getId(),7))
+                .item(new OrderItem(effectiveJava.getId(), 16))
+                .item(new OrderItem(puzzlers.getId(), 7))
                 .build();
 
         PlaceOrderResponse response = placeOrder.placeOrder(command);
@@ -84,41 +71,29 @@ public class ApplicationStartup implements CommandLineRunner {
 
     }
 
-    private void searchCatalog() {
-        findByTitle();
-        findAndUpdate();
-        findByTitle();
-        findByAuthor();
-    }
-
     private void initData() {
-        catalog.addBook(new CatalogUseCase.CreateBookCommand("Karaluchy", "Jo Nesbo", 1998, new BigDecimal("19.90")));
-        catalog.addBook(new CatalogUseCase.CreateBookCommand("Władca Pierścieni: Powrót Króla", "JRR Tolkien", 1955, new BigDecimal("11.90")));
-        catalog.addBook(new CatalogUseCase.CreateBookCommand("Pierwszy Śnieg", "Jo Nesbo", 2007, new BigDecimal("29.90")));
-        catalog.addBook(new CatalogUseCase.CreateBookCommand("I nie było już nikogo", "Agatha Christie", 1939, new BigDecimal("14.90")));
-    }
+        Author joshua = new Author("Joshua", "Bloch");
+        Author neal = new Author("Neal", "Gafter");
 
-    private void findByTitle() {
-        List<Book> books = catalog.findByTitle(title);
-        books.forEach(System.out::println);
-    }
+        authorRepository.save(joshua);
+        authorRepository.save(neal);
 
-    private void findByAuthor() {
-        List<Book> books = catalog.findByAuthor(author);
-        books.forEach(System.out::println);
-    }
+        CreateBookCommand effectiveJava = new CreateBookCommand(
+                "Effective Java",
+                Set.of(joshua.getId()),
+                2005,
+                new BigDecimal("79.00")
+        );
 
-    private void findAndUpdate() {
-        System.out.println("Updating book....");
-        catalog.findOneByTitleAndAuthor("Karaluchy", "Jo Nesbo")
-                .ifPresent(book -> {
-                    UpdateBookCommand command = UpdateBookCommand
-                            .builder()
-                            .id(book.getId())
-                            .title("Karaluchy test")
-                            .build();
-                    CatalogUseCase.UpdateBookResponse response = catalog.updateBook(command);
-                    System.out.println("Updating book result: " + response.isSuccess());
-                });
+        CreateBookCommand javaPuzzlers = new CreateBookCommand(
+                "Java Puzzlers",
+                Set.of(joshua.getId(), neal.getId()),
+                2018,
+                new BigDecimal("99.00")
+        );
+
+        catalog.addBook(javaPuzzlers);
+        catalog.addBook(effectiveJava);
+
     }
 }

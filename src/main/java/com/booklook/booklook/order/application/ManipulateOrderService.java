@@ -1,8 +1,8 @@
 package com.booklook.booklook.order.application;
 
 import com.booklook.booklook.order.application.port.ManipulateOrderUseCase;
+import com.booklook.booklook.order.db.OrderJpaRepository;
 import com.booklook.booklook.order.domain.Order;
-import com.booklook.booklook.order.domain.OrderRepository;
 import com.booklook.booklook.order.domain.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 class ManipulateOrderService implements ManipulateOrderUseCase {
 
-    private final OrderRepository repository;
+    private final OrderJpaRepository repository;
 
     @Override
     public PlaceOrderResponse placeOrder(PlaceOrderCommand command) {
@@ -27,7 +27,8 @@ class ManipulateOrderService implements ManipulateOrderUseCase {
 
     @Override
     public void deleteOrderById(Long id) {
-        repository.removeById(id);
+
+        repository.deleteById(id);
     }
 
     @Override

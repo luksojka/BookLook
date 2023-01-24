@@ -1,11 +1,11 @@
 package com.booklook.booklook.order.application;
 
+import com.booklook.booklook.catalog.db.BookJpaRepository;
 import com.booklook.booklook.catalog.domain.Book;
-import com.booklook.booklook.catalog.domain.CatalogRepository;
 import com.booklook.booklook.order.application.port.QueryOrderUseCase;
+import com.booklook.booklook.order.db.OrderJpaRepository;
 import com.booklook.booklook.order.domain.Order;
 import com.booklook.booklook.order.domain.OrderItem;
-import com.booklook.booklook.order.domain.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class QueryOrderService implements QueryOrderUseCase {
 
-    private final OrderRepository repository;
-    private final CatalogRepository catalogRepository;
+    private final OrderJpaRepository repository;
+    private final BookJpaRepository catalogRepository;
 
     @Override
     public List<RichOrder> findAll() {
