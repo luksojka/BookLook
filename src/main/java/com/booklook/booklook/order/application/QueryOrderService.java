@@ -6,6 +6,7 @@ import com.booklook.booklook.order.application.port.QueryOrderUseCase;
 import com.booklook.booklook.order.db.OrderJpaRepository;
 import com.booklook.booklook.order.domain.Order;
 import com.booklook.booklook.order.domain.OrderItem;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ public class QueryOrderService implements QueryOrderUseCase {
     private final BookJpaRepository catalogRepository;
 
     @Override
+    @Transactional
     public List<RichOrder> findAll() {
 
         return repository.findAll()

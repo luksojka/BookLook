@@ -10,11 +10,14 @@ import java.util.Optional;
 
 public interface BookJpaRepository extends JpaRepository<Book, Long> {
 
+    @Query("SELECT b FROM Book b JOIN FETCH b.authors")
+    List<Book> findAllEager();
+
     List<Book> findByAuthors_firstNameContainsIgnoreCaseOrAuthors_lastNameContainsIgnoreCase(String firstName, String lastName);
 
     List<Book> findByTitleContainsIgnoreCase(String title);
 
-    Optional<Book> findDistinctFirstByTitleContainsIgnoreCase(String title);
+    Optional<Book> findDistinctByTitleContainsIgnoreCase(String title);
 
     Optional<Book> findDistinctFirstByAuthors_firstNameContainsIgnoreCaseOrAuthors_lastNameContainsIgnoreCase(String firstName, String lastName);
 
@@ -28,7 +31,9 @@ public interface BookJpaRepository extends JpaRepository<Book, Long> {
             " WHERE " +
             " lower(b.title) LIKE lower(concat('%', :title, '%')) " +
             " AND " +
-            " (lower(a.firstName) LIKE lower(concat('%', :name, '%' ))) ")
-    List<Book> findByAuthorAndTitle(@Param("name") String name, @Param("title") String title);
+            " (lower(a.firstName) LIKE lower(concat('%', :name, '%' ))" +
+            " OR " +
+            " lower(a.lastName) LIKE lower(concat('%', :name, '%' ))) ")
+    List<Book> findByAuthorAndTitle(@Param("title") String title, @Param("name") String name);
 
 }

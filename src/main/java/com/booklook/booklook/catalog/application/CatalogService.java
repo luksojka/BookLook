@@ -11,6 +11,7 @@ import com.booklook.booklook.uploads.application.port.UploadUseCase.SaveUploadCo
 import com.booklook.booklook.uploads.domain.Upload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +29,7 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public List<Book> findAll() {
-        return repository.findAll();
+        return repository.findAllEager();
     }
 
     @Override
@@ -43,7 +44,7 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public Optional<Book> findOneByTitle(String title) {
-        return repository.findDistinctFirstByTitleContainsIgnoreCase(title);
+        return repository.findDistinctByTitleContainsIgnoreCase(title);
     }
 
     @Override
@@ -62,6 +63,7 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
+    @Transactional
     public Book addBook(CreateBookCommand command) {
         Book book = toBook(command);
         return repository.save(book);
@@ -70,9 +72,14 @@ class CatalogService implements CatalogUseCase {
     private Book toBook(CreateBookCommand command) {
         Book book = new Book(command.getTitle(), command.getYear(), command.getPrice());
         Set<Author> authors = fetchAuthorsByIds(command.getAuthors());
-        book.setAuthors(authors);
+        updateBooks(book, authors);
         return book;
 
+    }
+
+    private void updateBooks(Book book, Set<Author> authors) {
+        book.removeAuthors();
+        authors.forEach(author -> book.addAuthor(author));
     }
 
     private Set<Author> fetchAuthorsByIds(Set<Long> authors) {
@@ -86,33 +93,34 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
+    @Transactional
     public UpdateBookResponse updateBook(UpdateBookCommand command) {
         return repository
                 .findById(command.getId())
                 .map(book -> {
                     Book updatedBook = updateFields(command, book);
-                    repository.save(updatedBook);
                     return UpdateBookResponse.SUCCESS;
                 })
                 .orElseGet(() -> new UpdateBookResponse(false, Collections.singletonList("Book not found with id: " + command.getId())));
     }
 
     private Book updateFields(UpdateBookCommand command, Book book) {
-            if (command.getTitle() != null) {
-                book.setTitle(command.getTitle());
-            }
-            if (command.getAuthors() != null && command.getAuthors().size() > 0) {
-                book.setAuthors(fetchAuthorsByIds(command.getAuthors()));
-            }
-            if (command.getYear() != null) {
-                book.setYear(command.getYear());
-            }
-            if (command.getPrice() != null) {
-                book.setPrice(command.getPrice());
-            }
-            return book;
+        if (command.getTitle() != null) {
+            book.setTitle(command.getTitle());
+        }
+        if (command.getAuthors() != null && command.getAuthors().size() > 0) {
+            updateBooks(book, fetchAuthorsByIds(command.getAuthors()));
+        }
+        if (command.getYear() != null) {
+            book.setYear(command.getYear());
+        }
+        if (command.getPrice() != null) {
+            book.setPrice(command.getPrice());
+        }
+        return book;
 
     }
+
     @Override
     public void removeById(Long id) {
         repository.deleteById(id);

@@ -1,25 +1,20 @@
 package com.booklook.booklook.order.domain;
 
 import com.booklook.booklook.catalog.domain.Book;
+import com.booklook.booklook.jpa.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
-public class OrderItem {
-    @Id
-    @GeneratedValue
-    private Long id;
+@AllArgsConstructor
+public class OrderItem extends BaseEntity {
+
     private Long bookId;
     private int quantity;
 
-    public OrderItem(Long bookId, int quantity) {
-        this.bookId = bookId;
-        this.quantity = quantity;
-    }
 }
