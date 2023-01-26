@@ -7,10 +7,7 @@ import com.booklook.booklook.catalog.application.port.CatalogUseCase.UpdateBookC
 import com.booklook.booklook.catalog.application.port.CatalogUseCase.UpdateBookResponse;
 import com.booklook.booklook.catalog.domain.Book;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
@@ -109,8 +106,12 @@ class CatalogController {
         @DecimalMin("0.00")
         private BigDecimal price;
 
+        @NotNull
+        @PositiveOrZero
+        private Long available;
+
         CreateBookCommand toCreateCommand() {
-            return new CreateBookCommand(title, authors, year, price);
+            return new CreateBookCommand(title, authors, year, price, available);
         }
 
         UpdateBookCommand toUpdateCommand(Long id) {

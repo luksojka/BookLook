@@ -2,9 +2,7 @@ package com.booklook.booklook.order.domain;
 
 import com.booklook.booklook.catalog.domain.Book;
 import com.booklook.booklook.jpa.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -14,7 +12,9 @@ import lombok.*;
 @AllArgsConstructor
 public class OrderItem extends BaseEntity {
 
-    private Long bookId;
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    private Book book;
     private int quantity;
 
 }

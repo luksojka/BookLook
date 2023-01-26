@@ -1,10 +1,13 @@
 package com.booklook.booklook.catalog.web;
 
 import com.booklook.booklook.catalog.application.port.CatalogUseCase;
+import com.booklook.booklook.catalog.application.port.CatalogUseCase.CreateBookCommand;
 import com.booklook.booklook.catalog.db.AuthorJpaRepository;
 import com.booklook.booklook.catalog.domain.Author;
 import com.booklook.booklook.catalog.domain.Book;
 import com.booklook.booklook.order.application.port.ManipulateOrderUseCase;
+import com.booklook.booklook.order.application.port.ManipulateOrderUseCase.OrderItemCommand;
+import com.booklook.booklook.order.application.port.ManipulateOrderUseCase.PlaceOrderCommand;
 import com.booklook.booklook.order.application.port.QueryOrderUseCase;
 import com.booklook.booklook.order.domain.OrderItem;
 import com.booklook.booklook.order.domain.Recipient;
@@ -48,15 +51,11 @@ public class AdminController {
                 .email("jan@example.org")
                 .build();
 
-//        if (true) {
-//            throw new IllegalStateException("POISON");
-//        }
-
-        ManipulateOrderUseCase.PlaceOrderCommand command = ManipulateOrderUseCase.PlaceOrderCommand
+        PlaceOrderCommand command = PlaceOrderCommand
                 .builder()
                 .recipient(recipient)
-                .item(new OrderItem(effectiveJava.getId(), 16))
-                .item(new OrderItem(puzzlers.getId(), 7))
+                .item(new OrderItemCommand(effectiveJava.getId(), 16))
+                .item(new OrderItemCommand(puzzlers.getId(), 7))
                 .build();
 
         ManipulateOrderUseCase.PlaceOrderResponse response = placeOrder.placeOrder(command);
@@ -80,18 +79,20 @@ public class AdminController {
         authorRepository.save(joshua);
         authorRepository.save(neal);
 
-        CatalogUseCase.CreateBookCommand effectiveJava = new CatalogUseCase.CreateBookCommand(
+        CreateBookCommand effectiveJava = new CreateBookCommand(
                 "Effective Java",
                 Set.of(joshua.getId()),
                 2005,
-                new BigDecimal("79.00")
+                new BigDecimal("79.00"),
+                50L
         );
 
-        CatalogUseCase.CreateBookCommand javaPuzzlers = new CatalogUseCase.CreateBookCommand(
+        CreateBookCommand javaPuzzlers = new CreateBookCommand(
                 "Java Puzzlers",
                 Set.of(joshua.getId(), neal.getId()),
                 2018,
-                new BigDecimal("99.00")
+                new BigDecimal("99.00"),
+                50L
         );
 
         catalog.addBook(javaPuzzlers);

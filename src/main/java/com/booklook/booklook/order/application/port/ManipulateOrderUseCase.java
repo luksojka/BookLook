@@ -4,13 +4,11 @@ import com.booklook.booklook.commons.Either;
 import com.booklook.booklook.order.domain.OrderItem;
 import com.booklook.booklook.order.domain.OrderStatus;
 import com.booklook.booklook.order.domain.Recipient;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Singular;
-import lombok.Value;
+import lombok.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Collections.*;
 
@@ -26,8 +24,14 @@ public interface ManipulateOrderUseCase {
     @AllArgsConstructor
     class PlaceOrderCommand {
         @Singular
-        List<OrderItem> items;
+        Set<OrderItemCommand> items;
         Recipient recipient;
+    }
+
+    @Value
+    static class OrderItemCommand {
+        Long bookId;
+        int quantity;
     }
 
     @Value
