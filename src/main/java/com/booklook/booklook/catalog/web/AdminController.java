@@ -12,6 +12,7 @@ import com.booklook.booklook.order.application.port.QueryOrderUseCase;
 import com.booklook.booklook.order.domain.OrderItem;
 import com.booklook.booklook.order.domain.Recipient;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/admin")
 @AllArgsConstructor
+@Slf4j
 public class AdminController {
 
     private final CatalogUseCase catalog;
@@ -65,10 +67,10 @@ public class AdminController {
                 error -> "Failed to create order: " + error
         );
 
-        System.out.println(result);
+        log.info(result);
 
         queryOrder.findAll()
-                .forEach(order -> System.out.println("GOT ORDER WITH TOTAL PRICE" + order.totalPrice() + " DETAILS: " + order));
+                .forEach(order -> log.info("GOT ORDER WITH TOTAL PRICE" + order.totalPrice() + " DETAILS: " + order));
 
     }
 

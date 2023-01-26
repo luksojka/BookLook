@@ -4,12 +4,14 @@ import com.booklook.booklook.uploads.application.port.UploadUseCase;
 import com.booklook.booklook.uploads.db.UploadJpaRepository;
 import com.booklook.booklook.uploads.domain.Upload;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UploadService implements UploadUseCase {
 
     private final UploadJpaRepository repository;
@@ -23,7 +25,7 @@ public class UploadService implements UploadUseCase {
                 command.getFile()
         );
         repository.save(upload);
-        System.out.println("Upload saved: " + upload.getFilename() + " with id: " + upload.getId());
+        log.info("Upload saved: " + upload.getFilename() + " with id: " + upload.getId());
         return upload;
     }
 
