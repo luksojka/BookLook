@@ -1,11 +1,9 @@
 package com.booklook.booklook.order.application;
 
 import com.booklook.booklook.catalog.db.BookJpaRepository;
-import com.booklook.booklook.catalog.domain.Book;
 import com.booklook.booklook.order.application.port.QueryOrderUseCase;
 import com.booklook.booklook.order.db.OrderJpaRepository;
 import com.booklook.booklook.order.domain.Order;
-import com.booklook.booklook.order.domain.OrderItem;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

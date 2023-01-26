@@ -3,7 +3,7 @@ package com.booklook.booklook.order.web;
 import com.booklook.booklook.order.application.port.ManipulateOrderUseCase;
 import com.booklook.booklook.order.application.port.ManipulateOrderUseCase.PlaceOrderCommand;
 import com.booklook.booklook.order.application.port.QueryOrderUseCase;
-import com.booklook.booklook.order.application.port.QueryOrderUseCase.RichOrder;
+import com.booklook.booklook.order.application.RichOrder;
 import com.booklook.booklook.order.domain.OrderStatus;
 import com.booklook.booklook.web.CreatedURI;
 import lombok.AllArgsConstructor;
