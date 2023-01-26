@@ -44,17 +44,17 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public Optional<Book> findOneByTitle(String title) {
-        return repository.findDistinctByTitleContainsIgnoreCase(title);
+        return repository.findDistinctFirstByTitleContainsIgnoreCase(title);
     }
 
     @Override
     public List<Book> findByAuthor(String author) {
-        return repository.findByAuthors_firstNameContainsIgnoreCaseOrAuthors_lastNameContainsIgnoreCase(author, author);
+        return repository.findByAuthors_nameContainsIgnoreCase(author);
     }
 
     @Override
     public Optional<Book> findOneByAuthor(String author) {
-        return repository.findDistinctFirstByAuthors_firstNameContainsIgnoreCaseOrAuthors_lastNameContainsIgnoreCase(author, author);
+        return repository.findDistinctFirstByAuthors_nameContainsIgnoreCase(author);
     }
 
     @Override
